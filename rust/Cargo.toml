@@ -1,0 +1,27 @@
+[package]
+name = "plugin-system"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+cxx = "1.0.95"
+cxx-qt = "0.6"
+cxx-qt-lib = "0.6"
+reqwest = { version = "0.12.5", features = ["json"] }
+tokio = { version = "1.38.0", features = ["full"] }
+futures = { version = "0.3.30", features = ["async-await"] }
+title-plugin-system = { path = "../../../RustroverProjects/title-plugin-system" }
+once_cell = "1.19.0"
+async-std = { version = "1.12.0", features = ["tokio1"] }
+serde_json = "1.0.120"
+
+[build-dependencies]
+cxx-qt-build = "0.6"
+
+[features]
+# This feature must be enabled for `cargo test` when linking Qt 6 statically.
+link_qt_object_files = [ "cxx-qt-build/link_qt_object_files" ]

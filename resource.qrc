@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="Main.qml">qml/Main.qml</file>
+    </qresource>
+    <qresource prefix="/pages">
+        <file alias="HomePage.qml">qml/pages/HomePage.qml</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="User.svg">assets/icons/User.svg</file>
+        <file alias="Search.svg">assets/icons/Search.svg</file>
+        <file alias="Home.svg">assets/icons/Home.svg</file>
+        <file alias="Close.svg">assets/icons/Close.svg</file>
+    </qresource>
+    <qresource prefix="/components">
+        <file alias="TitleBar.qml">qml/components/TitleBar.qml</file>
+        <file alias="Tooltip.qml">qml/components/Tooltip.qml</file>
+    </qresource>
+</RCC>
