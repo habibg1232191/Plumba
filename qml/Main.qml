@@ -32,8 +32,13 @@ Window {
         }
     }
 
+    Component.onCompleted: {
+        pluginSystem.loadDirectory("/home/lolkapm/QtProjects/plumba-plugins/plugins")
+    }
+
     Item {
         property int lenghtResize: 7
+
         MouseArea {
             width: parent.lenghtResize
             height: rootWindow.height
@@ -123,10 +128,11 @@ Window {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
+
                     StackView {
                         id: rootStackView
                         anchors.fill: parent
-                        initialItem: HomePage {}
+                        initialItem: HomePage { }
 
                         pushEnter: Transition {
                             PropertyAnimation {
@@ -136,6 +142,7 @@ Window {
                                 duration: 200
                             }
                         }
+
                         pushExit: Transition {
                             PropertyAnimation {
                                 property: "opacity"
@@ -144,6 +151,7 @@ Window {
                                 duration: 200
                             }
                         }
+
                         popEnter: Transition {
                             PropertyAnimation {
                                 property: "opacity"
@@ -152,6 +160,7 @@ Window {
                                 duration: 200
                             }
                         }
+
                         popExit: Transition {
                             PropertyAnimation {
                                 property: "opacity"

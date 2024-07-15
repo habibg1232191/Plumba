@@ -9,21 +9,24 @@ int main(int argc, char *argv[])
 {
     QQuickWindow::setGraphicsApi(QSGRendererInterface::VulkanRhi);
     qputenv("QT_ASSUME_STDERR_HAS_CONSOLE", "1");
-    QGuiApplication app(argc, argv);
-    qDebug() << "Debug";
-
+    
+    QGuiApplication application(argc, argv);
+    
     QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("qrc:/Main.qml"));
+    
+    const QUrl qmlUrl(QStringLiteral("qrc:/Main.qml"));
+    
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,
-        &app,
+        &application,
         []() { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
-
+        Qt::QueuedConnection
+    );
+    
     qmlRegisterType<PluginSystem>("com.kdab.cxx_qt.demo", 1, 0, "PluginSystem");
-
-    engine.load(url);
-
-    return app.exec();
+    
+    engine.load(qmlUrl);
+    
+    return application.exec();
 }

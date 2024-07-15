@@ -5,8 +5,12 @@ import "../components"
 
 Item {
     id: root
+    anchors.fill: parent
+
     property var season_animes: []
+    property var top_animes: []
     property var seasonAnimeModel
+    property var topAnimesModel
 
     Connections {
         target: pluginSystem
@@ -19,13 +23,22 @@ Item {
                 }
                 seasonAnimeModel = season_animes
         }
+
+        onTopTitleLoaded: (top_anime_res) => {
+                let animes = JSON.parse(top_anime_res);
+                for(var i = 0; i < animes.length; ++i) {
+                    top_animes.push(animes[i])
+                }
+                topAnimesModel = top_animes
+        }
     }
 
     Component.onCompleted: {
         pluginSystem.seasonTitleLoad()
+        pluginSystem.getTopTitles()
     }
 
-    Column {
+    ColumnLayout {
         anchors.fill: parent
         anchors.leftMargin: 20
         anchors.topMargin: 10
@@ -38,20 +51,12 @@ Item {
         }
 
         ListView {
-            height: 400
-            width: parent.width
+            Layout.preferredHeight: 400
+            Layout.fillWidth: true
             snapMode: ListView.SnapToItem
             orientation: ListView.Horizontal
             model: root.seasonAnimeModel
             spacing: 12
-
-            rebound: Transition {
-                NumberAnimation {
-                    properties: "x,y"
-                    duration: 400
-                    easing.type: Easing.OutElastic
-                }
-            }
 
             delegate: Item {
                 id: delegateRoot
@@ -94,11 +99,11 @@ Item {
                                 states: [
                                     State {
                                         when: imgAnime.status === Image.Ready
-                                        PropertyChanges { target: imgAnime; opacity: 1; scale: 1 }
+                                        PropertyChanges { opacity: 1; scale: 1 }
                                     },
                                     State {
                                         when: imgAnime.status === Image.Loading
-                                        PropertyChanges { target: imgAnime; opacity: 0; scale: 0.9 }
+                                        PropertyChanges { opacity: 0; scale: 0.9 }
                                     }
                                 ]
                                 transitions: [
@@ -110,8 +115,6 @@ Item {
                                             properties: "opacity,y,scale"
                                         }
                                     }
-
-
                                 ]
 
                                 layer.enabled: true
@@ -131,7 +134,6 @@ Item {
                                 return t > max ? max : t
                             }
                             Layout.preferredWidth: clamp(implicitWidth, 0, imgAnime.width - 12*2)
-                            //Layout.fillWidth: true
                             Layout.alignment: Qt.AlignHCenter
                             Layout.leftMargin: 12
                             Layout.rightMargin: 12
@@ -160,9 +162,129 @@ Item {
                                     font.pixelSize: 15
                                 }
                             }
+                        }
 
-                            Behavior on y {
-                                NumberAnimation {}
+                        Item {
+                            Layout.preferredHeight: 10
+                        }
+                    }
+                }
+            }
+        }
+
+        GridView {
+            Layout.fillWidth: true
+            Layout.preferredHeight: rootWindow.height
+            clip: true
+            cellWidth: 240
+            cellHeight: 400
+            model: root.topAnimesModel
+
+            delegate: Item {
+                id: delegateRootGrid
+                width: 240;  height: layGrid.height
+
+                DropShadow {
+                    anchors.fill: delRectGrid
+                    source: delRectGrid
+                    radius: 4
+                    spread: 0
+                    horizontalOffset: 0
+                    verticalOffset: 0
+                }
+
+                Rectangle {
+                    id: delRectGrid
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    color: "#272727"
+                    radius: 10
+
+                    ColumnLayout {
+                        id: layGrid
+                        anchors.margins: 5
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+
+                        Item {
+                            id: imgRootGrid
+                            Layout.preferredWidth: delRectGrid.width - 10
+                            Layout.minimumHeight: 340
+
+                            Image {
+                                id: imgAnimeGrid
+                                anchors.fill: parent
+                                source: modelData.image.original
+                                asynchronous: true
+                                cache: true
+                                fillMode: Image.PreserveAspectCrop
+
+                                states: [
+                                    State {
+                                        when: imgAnimeGrid.status === Image.Ready
+                                        PropertyChanges { target: imgAnimeGrid; opacity: 1; scale: 1 }
+                                    },
+                                    State {
+                                        when: imgAnimeGrid.status === Image.Loading
+                                        PropertyChanges { target: imgAnimeGrid; opacity: 0; scale: 0.9 }
+                                    }
+                                ]
+                                transitions: [
+                                    Transition {
+                                        to: "*"
+                                        NumberAnimation {
+                                            target: imgAnimeGrid
+                                            duration: 200
+                                            properties: "opacity,y,scale"
+                                        }
+                                    }
+                                ]
+
+                                layer.enabled: true
+                                layer.effect: OpacityMask {
+                                    maskSource: Rectangle {
+                                        width: imgAnimeGrid.width; height: imgAnimeGrid.height;
+                                        radius: 10;
+                                    }
+                                }
+                            }
+                        }
+
+                        Text {
+                            id: txtGrid
+                            function clamp(value, min, max) {
+                                let t = value < min ? min : value
+                                return t > max ? max : t
+                            }
+                            Layout.preferredWidth: clamp(implicitWidth, 0, imgAnimeGrid.width - 12*2)
+                            //Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.leftMargin: 12
+                            Layout.rightMargin: 12
+                            wrapMode: Text.WordWrap
+                            text: modelData.russian_name
+                            font.pixelSize: 18
+                            maximumLineCount: 1
+                            elide: Text.ElideRight
+                            color: "white"
+
+                            MouseArea {
+                                id: txtAreaGrid
+                                anchors.fill: parent
+                                hoverEnabled: true
+                            }
+
+                            Tooltip {
+                                visibility: txtGrid.truncated ? txtAreaGrid.containsMouse : false
+                                yPopup: parent.height + 8
+                                xPopup: parent.width / 2 - implicitWidth / 2
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.russian_name
+                                    color: "white"
+                                    font.pixelSize: 15
+                                }
                             }
                         }
                         Item {
